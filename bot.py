@@ -16,6 +16,7 @@ client = discord.Client()
 @client.event
 async def on_ready():
     print(f'{client.user} has connected to Discord!')
+    await client.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="fortnite funny moments"))
 
 @client.event
 async def on_message(msg):
@@ -36,7 +37,7 @@ async def on_message(msg):
             file.close()
 
         print("Confession Received")
-        approvalChannel = client.get_channel(772794603954110466)
+        approvalChannel = client.get_channel(772794910826430494)
         fullConfession = "#" + str(count) + ": ", str(msg.content)
         await approvalChannel.send(''.join(fullConfession))
 
@@ -97,8 +98,6 @@ async def on_message(msg):
             farenheit = str(int((celsius * 9/5) + 32))
             result = str(celsius) + " degrees celsius is equal to " + str(farenheit) + " degrees farenheit"
             msg.channel.send(''.join(result))
-        elif msg.content.startswith('= '):
-            print("poo")
         elif msg.content.startswith('=g') or msg.content.startswith('=google'):
             query = ''.join(args)
 
@@ -109,33 +108,36 @@ async def on_message(msg):
             print("google search requested: " + query)
 
             embed = discord.Embed(title = "Search Results")
-            num = 0 #added before each result, as a count
+            num = 0
 
-            headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36"}
+            headers = {'User-Agent': 'Mozilla/5.0'}
             
             for results in search(query, num = 1, stop = 3, pause = 1, tld = "co.in"):
                 print(results)
-                num += 1 #added before each result, as a count
-                reqs = requests.get(results, headers = headers)
-                soup = BeautifulSoup(reqs.text, 'html.parser') #gets the title for each result webpage
+                num += 1
+                reqs = requests.get(results)
+                soup = BeautifulSoup(reqs.text, 'html.parser')
                 siteTitle = ''
                 for title in soup.find_all('title'): 
                     siteTitle = title.get_text()
-                name = str(num) + ": " + str(siteTitle) #constructs the message with required info
+                name = str(num) + ": " + str(siteTitle)
                 embed.add_field(name = name, value = results, inline = False)
 
             await msg.channel.send(embed = embed)
         elif msg.content.startswith('=yt') or msg.content.startswith('=youtube'):
-            query = ''.join(args) #joins arguments in a string
-            results = Search(query, limit = 1) #searches the query up on youtube. limit set to 1 so we only get 1 search result
-            info = results.result(mode = ResultMode.dict) #takes all the data from previous line and stores it in a dictionary
-            # print(info) #used when i need to debug (keep commented when not in use or the console looks fugly)
-            # print("-"*100) #makes it easier to seperate youtube searches (also used for debugging)
-            title = info['result'][0]['title'] #looks through dictionary, keeps important parts in variables
+            query = ''.join(args)
+            results = Search(query, limit = 1)
+            info = results.result(mode = ResultMode.dict)
+            embed = discord.Embed(title = 'YouTube Results')
+            print(info)
+            print("--------------------------------------------------------------------------------------------------------------")
+            title = info['result'][0]['title']
             url = info['result'][0]['link']
             type = info['result'][0]['type']
-            video = '**', title, '**', ' (', type, ')', ':' '\n', url #constructs the message with required info
+            video = '**', title, '**', ' (', type, ')', ':' '\n', url
             await msg.channel.send(''.join(video))
+        elif msg.content.startswith('=img') or msg.content.startswith('-image'):
+            return
         else:
             await msg.channel.send('Command not recognized. Try =help!')
 
