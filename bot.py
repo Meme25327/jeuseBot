@@ -37,7 +37,7 @@ async def on_message(msg):
             file.close()
 
         print("Confession Received")
-        approvalChannel = client.get_channel(772794910826430494)
+        approvalChannel = client.get_channel(772794603954110466) #should end with 0466
         fullConfession = "#" + str(count) + ": ", str(msg.content)
         await approvalChannel.send(''.join(fullConfession))
 
@@ -84,7 +84,7 @@ async def on_message(msg):
 
             numToApprove = splitMsg.pop(1)
             print("confession #" + numToApprove, "will be approved.")
-            confessionChannel = client.get_channel(772794910826430494)
+            confessionChannel = client.get_channel(772794910826430494) #should end with 0494
             await confessionChannel.send("Confession received: " + data[int(numToApprove)])
         elif msg.content.startswith('=github'):
             await msg.channel.send("jeuseBot's code can be found at: https://github.com/Meme25327/jeuseBot")
