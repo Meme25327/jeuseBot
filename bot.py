@@ -30,15 +30,21 @@ async def on_message(msg):
     #Confession handler. Looks for DMs and sends them for approval.
     if isinstance(msg.channel, discord.channel.DMChannel):
 
+        rawMsg = str(msg.content)
+        confession = rawMsg.replace('\n', '. ').replace(' .', '.').replace('.. ', '. ')
+
         #stores confessions in a seperate text document
         with open("confessions.txt", "r+") as file:
             count = len(file.readlines())
-            file.write(msg.content + "\n")
+            
+            print(confession)
+
+            file.write(confession + "\n")
             file.close()
 
         print("Confession Received")
-        approvalChannel = client.get_channel(772794603954110466) #should end with 0466
-        fullConfession = "#" + str(count) + ": ", str(msg.content)
+        approvalChannel = client.get_channel(772794603954110466) #should end with 0466 when running
+        fullConfession = "#" + str(count) + ": ", confession
         await approvalChannel.send(''.join(fullConfession))
 
     #Checks whether the message starts with the prefix. If this is not there, bot replies to every message
@@ -84,7 +90,7 @@ async def on_message(msg):
 
             numToApprove = splitMsg.pop(1)
             print("confession #" + numToApprove, "will be approved.")
-            confessionChannel = client.get_channel(772794910826430494) #should end with 0494
+            confessionChannel = client.get_channel(772794910826430494) #should end with 0494 when running
             await confessionChannel.send("Confession received: " + data[int(numToApprove)])
         elif msg.content.startswith('=github'):
             await msg.channel.send("jeuseBot's code can be found at: https://github.com/Meme25327/jeuseBot")
