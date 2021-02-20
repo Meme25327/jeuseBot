@@ -27,6 +27,9 @@ async def on_message(msg):
     splitMsg = msg.content.split(' ')
     args = splitMsg[1:]
 
+    if msg.attachments:
+        msg.content = msg.content + " " + msg.attachments[0].url
+
     #Confession handler. Looks for DMs and sends them for approval.
     if isinstance(msg.channel, discord.channel.DMChannel):
 
@@ -52,7 +55,7 @@ async def on_message(msg):
         if msg.content.startswith('=ping'): #ping command
             await msg.channel.send('Pong!')
         elif msg.content.startswith('=help'): #help command
-            await msg.channel.send('jeuseBot\'s help menu can be found at: http://jb.joemama.site')
+            await msg.channel.send('jeuseBot\'s help menu can be found at: https://meme25327.github.io/jeuseBot/')
         elif msg.content.startswith('=sunglasses'): #sunglasses command
             if msg.author.id == 258582004738555904:
                 await msg.channel.send("<@258582004738555904> is SO FUCKING COOL. All the ladies fall for him wherever he goes. He is super cool and super smart and super amazing and is the perfect specimen of human being. I really fucking love him because he is so cool and he also made me so that makes him EXTRA COOL!!!!!!!!!!!!!!!!!")
@@ -91,7 +94,12 @@ async def on_message(msg):
             numToApprove = splitMsg.pop(1)
             print("confession #" + numToApprove, "will be approved.")
             confessionChannel = client.get_channel(772794910826430494) #should end with 0494 when running
-            await confessionChannel.send("Confession received: " + data[int(numToApprove)])
+
+            if args[1] == "spoiler" or args[1] == "spoil":
+                await confessionChannel.send("Confession received: || " + data[int(numToApprove)] + " || (spoiler tags typically indicate NSFW content)")
+            else:
+                await confessionChannel.send("Confession received: " + data[int(numToApprove)])
+                
         elif msg.content.startswith('=github'):
             await msg.channel.send("jeuseBot's code can be found at: https://github.com/Meme25327/jeuseBot")
         elif msg.content.startswith('=ftoc'):
