@@ -13,6 +13,9 @@ load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 client = discord.Client()
 
+intents = discord.Intents
+intents.members = True
+
 @client.event
 async def on_ready():
     print(f'{client.user} has connected to Discord!')
@@ -28,7 +31,7 @@ async def on_message(msg):
     args = splitMsg[1:]
 
     if msg.attachments:
-        msg.content = msg.content + " " + msg.attachments[0].url
+        msg.content = msg.content + " " + msg.attachments[0].proxy_url
 
     #Confession handler. Looks for DMs and sends them for approval.
     if isinstance(msg.channel, discord.channel.DMChannel):
@@ -37,18 +40,19 @@ async def on_message(msg):
         confession = rawMsg.replace('\n', '. ').replace(' .', '.').replace('.. ', '. ')
 
         #stores confessions in a seperate text document
-        with open("confessions.txt", "r+") as file:
-            count = len(file.readlines())
-            
-            print(confession)
-
-            file.write(confession + "\n")
-            file.close()
+        #with open("confessions.txt", "r+") as file:
+        #   count = len(file.readlines())
+        #    
+        #   print(confession)
+        #
+        #  file.write(confession + "\n")
+        #   file.close()
 
         print("Confession Received")
         approvalChannel = client.get_channel(772794603954110466) #should end with 0466 when running
-        fullConfession = "#" + str(count) + ": ", confession
-        await approvalChannel.send(''.join(fullConfession))
+        fullConfession = confession
+        confessionChannel = client.get_channel(772794910826430494) #should end with 0494 when running
+        await confessionChannel.send('Confession Received: ' + ''.join(fullConfession))
 
     #Checks whether the message starts with the prefix. If this is not there, bot replies to every message
     if msg.content.startswith("="):
@@ -94,9 +98,13 @@ async def on_message(msg):
             numToApprove = splitMsg.pop(1)
             print("confession #" + numToApprove, "will be approved.")
             confessionChannel = client.get_channel(772794910826430494) #should end with 0494 when running
-
-            if args[1] == "spoiler" or args[1] == "spoil":
-                await confessionChannel.send("Confession received: || " + data[int(numToApprove)] + " || (spoiler tags typically indicate NSFW content)")
+            
+            if len(args) > 1:
+                if args[1] == "spoiler" or args[1] == "spoil":
+                    await confessionChannel.send("Confession received: || " + data[int(numToApprove)] + " || (spoiler tags typically indicate NSFW content)")
+                else:
+                    approvalChannel = client.get_channel(772794603954110466) #should end with 0466 when running
+                    await approvalChannel.send("Please try that again!")
             else:
                 await confessionChannel.send("Confession received: " + data[int(numToApprove)])
                 
@@ -111,7 +119,7 @@ async def on_message(msg):
             celsius = float(args[0])
             farenheit = str(int((celsius * 9/5) + 32))
             result = str(celsius) + " degrees celsius is equal to " + str(farenheit) + " degrees farenheit"
-            msg.channel.send(''.join(result))
+            await msg.channel.send(''.join(result))
         elif msg.content.startswith('=g') or msg.content.startswith('=google'):
             query = ''.join(args)
 
@@ -141,6 +149,7 @@ async def on_message(msg):
         elif msg.content.startswith('=yt') or msg.content.startswith('=youtube'):
             query = ''.join(args)
             results = Search(query, limit = 1)
+            print(results)
             info = results.result(mode = ResultMode.dict)
             embed = discord.Embed(title = 'YouTube Results')
             print(info)
@@ -150,8 +159,38 @@ async def on_message(msg):
             type = info['result'][0]['type']
             video = '**', title, '**', ' (', type, ')', ':' '\n', url
             await msg.channel.send(''.join(video))
-        elif msg.content.startswith('=img') or msg.content.startswith('-image'):
+        elif msg.content.startswith('=img') or msg.content.startswith('=image'):
             return
+        elif msg.content.startswith('=nick'):
+            num = 0
+            guild = msg.guild
+            for i in guild.members:
+                print(guild.members)
+
+            '''print(memberList)
+            for mem in memberList:
+                if str(args[0]) == "reset":
+                    await mem.edit(nick = None)
+                else:
+                    await mem.edit(nick = str(args[0]))
+                num += 1
+            await msg.channel.send(num)'''
+        elif msg.content.startswith('=troll'):
+            vicChannelID = args[0]
+            vicChannel = client.get_channel(int(vicChannelID))
+            await vicChannel.send(' '.join(args[1:]))
+        elif msg.content.startswith('=truth'):
+            with open('truths.txt', 'r') as truths:
+                truths = truths.readlines()
+                rng = random.randint(0, 83)
+                truth = truths[rng]
+                await msg.channel.send(truth)
+        elif msg.content.startswith('=dare'):
+            with open('dares.txt', 'r') as dares:
+                dares = dares.readlines()
+                rng = random.randint(0, 40)
+                dare = dares[rng]
+                await msg.channel.send(dare)
         else:
             await msg.channel.send('Command not recognized. Try =help!')
 
