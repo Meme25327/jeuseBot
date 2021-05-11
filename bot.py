@@ -175,10 +175,6 @@ async def on_message(msg):
                     await mem.edit(nick = str(args[0]))
                 num += 1
             await msg.channel.send(num)'''
-        elif msg.content.startswith('=troll'):
-            vicChannelID = args[0]
-            vicChannel = client.get_channel(int(vicChannelID))
-            await vicChannel.send(' '.join(args[1:]))
         elif msg.content.startswith('=truth'):
             with open('truths.txt', 'r') as truths:
                 truths = truths.readlines()
