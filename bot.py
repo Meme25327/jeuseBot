@@ -8,6 +8,8 @@ from bs4 import BeautifulSoup
 import requests
 from youtubesearchpython import SearchVideos, Search
 from youtubesearchpython.internal.constants import ResultMode
+from PIL import Image, ImageFont, ImageDraw
+import textwrap
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -36,9 +38,6 @@ async def on_message(msg):
     #Confession handler. Looks for DMs and sends them for approval.
     if isinstance(msg.channel, discord.channel.DMChannel):
 
-        rawMsg = str(msg.content)
-        confession = rawMsg.replace('\n', '. ').replace(' .', '.').replace('.. ', '. ')
-
         #stores confessions in a seperate text document
         #with open("confessions.txt", "r+") as file:
         #   count = len(file.readlines())
@@ -47,12 +46,17 @@ async def on_message(msg):
         #
         #  file.write(confession + "\n")
         #   file.close()
-
-        print("Confession Received")
-        approvalChannel = client.get_channel(772794603954110466) #should end with 0466 when running
-        fullConfession = confession
-        confessionChannel = client.get_channel(772794910826430494) #should end with 0494 when running
-        await confessionChannel.send('Confession Received: ' + ''.join(fullConfession))
+    
+        if msg.attachments or "http" in msg.content:
+            await msg.channel.send("Sorry, but confessing attachments is temporarily not available. Try confessing again. This time without any images/videos/links/etc.")
+        else:
+            rawMsg = str(msg.content)
+            confession = rawMsg.replace('\n', '. ').replace(' .', '.').replace('.. ', '. ')
+            print("Confession Received")
+            approvalChannel = client.get_channel(772794603954110466) #should end with 0466 when running
+            fullConfession = confession
+            confessionChannel = client.get_channel(772794910826430494) #should end with 0494 when running
+            await confessionChannel.send('Confession Received: ' + ''.join(fullConfession))
 
     #Checks whether the message starts with the prefix. If this is not there, bot replies to every message
     if msg.content.startswith("="):
@@ -63,6 +67,8 @@ async def on_message(msg):
         elif msg.content.startswith('=sunglasses'): #sunglasses command
             if msg.author.id == 258582004738555904:
                 await msg.channel.send("<@258582004738555904> is SO FUCKING COOL. All the ladies fall for him wherever he goes. He is super cool and super smart and super amazing and is the perfect specimen of human being. I really fucking love him because he is so cool and he also made me so that makes him EXTRA COOL!!!!!!!!!!!!!!!!!")
+            elif msg.author.id == 357576484543660043:
+                await msg.channel.send("<@357576484543660043> is down bad.")
             else:
                 await msg.channel.send(":sunglasses: im really cool, and so is <@" + str(msg.author.id) + ">")
         elif msg.content.startswith('=speak'): #speak command
@@ -159,8 +165,6 @@ async def on_message(msg):
             type = info['result'][0]['type']
             video = '**', title, '**', ' (', type, ')', ':' '\n', url
             await msg.channel.send(''.join(video))
-        elif msg.content.startswith('=img') or msg.content.startswith('=image'):
-            return
         elif msg.content.startswith('=nick'):
             num = 0
             guild = msg.guild
@@ -187,6 +191,36 @@ async def on_message(msg):
                 rng = random.randint(0, 40)
                 dare = dares[rng]
                 await msg.channel.send(dare)
+        elif msg.content.startswith('=cum'): #shoutout jaggi
+            await msg.channel.send( "<@357576484543660043>")
+        elif msg.content.startswith('=quote'): #shoutout piracy
+            with open('quotes.txt', 'r') as quotes:
+                quoteList = quotes.readlines()
+                rng = random.randint(0, 30)
+                selectedQuote = quoteList[rng]
+                print(selectedQuote)
+                await msg.channel.send(selectedQuote)
+        elif msg.content.startswith('=1984'): #shoutout laura
+            if msg.reference:
+                repliedMsg = await msg.channel.fetch_message(msg.reference.message_id)
+                my_image = Image.open("1984.png")
+                title_font = ImageFont.truetype('impact.ttf', 50)
+                text_to_add = repliedMsg.content
+                image_editable = ImageDraw.Draw(my_image)
+                width, height = image_editable.textsize(text_to_add, font=title_font)
+                lines = textwrap.wrap(text_to_add, width=20)
+                y_text = 0
+                for line in lines:
+                    width, height = title_font.getsize(line)
+                    image_editable.text((200 - width/2, y_text), line, font=title_font, stroke_width=5, stroke_fill=(0, 0, 0))
+                    y_text += height
+                print(width)
+                #image_editable.text((200 - width/2, 0), text_to_add, (255, 255, 255), font=title_font)
+                my_image.save("result.png")
+                file = discord.File("result.png")
+                await msg.channel.send(file=file)
+            else:
+                await msg.channel.send("You need to be replying to a message!")
         else:
             await msg.channel.send('Command not recognized. Try =help!')
 
