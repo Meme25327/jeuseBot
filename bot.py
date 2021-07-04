@@ -46,17 +46,19 @@ async def on_message(msg):
         #
         #  file.write(confession + "\n")
         #   file.close()
-    
-        if msg.attachments or "http" in msg.content:
-            await msg.channel.send("Sorry, but confessing attachments is temporarily not available. Try confessing again. This time without any images/videos/links/etc.")
+        rawMsg = str(msg.content)
+        confession = rawMsg.replace('\n', '. ').replace(' .', '.').replace('.. ', '. ')
+        print("Confession Received")
+        approvalChannel = client.get_channel(772794603954110466) #should end with 0466 when running
+        fullConfession = confession
+        confessionChannel = client.get_channel(772794910826430494) #should end with 0494 when running
+        if "<@" in msg.content:
+            await msg.channel.send("You can't ping anyone in a confession. If you're calling out someone specific, you can still use their name, just not ping them")
         else:
-            rawMsg = str(msg.content)
-            confession = rawMsg.replace('\n', '. ').replace(' .', '.').replace('.. ', '. ')
-            print("Confession Received")
-            approvalChannel = client.get_channel(772794603954110466) #should end with 0466 when running
-            fullConfession = confession
-            confessionChannel = client.get_channel(772794910826430494) #should end with 0494 when running
-            await confessionChannel.send('Confession Received: ' + ''.join(fullConfession))
+            if msg.attachments or "http://cdn.discordapp" in msg.content:
+                await msg.channel.send("Sorry, but confessing direct attachments is temporarily not available.")
+            else:
+                await confessionChannel.send('Confession Received: ' + ''.join(fullConfession))
 
     #Checks whether the message starts with the prefix. If this is not there, bot replies to every message
     if msg.content.startswith("="):
@@ -72,7 +74,10 @@ async def on_message(msg):
             else:
                 await msg.channel.send(":sunglasses: im really cool, and so is <@" + str(msg.author.id) + ">")
         elif msg.content.startswith('=speak'): #speak command
-            await msg.channel.send(' '.join(args))
+            if "<@" in msg.content:
+                await msg.channel.send("You can't ping anyone with this command.")
+            else:
+                await msg.channel.send(' '.join(args))
         elif msg.content.startswith('=avatar') or msg.content.startswith('=pfp'): #pfp command
             if msg.content == "=pfp" or msg.content == "=avatar" :
                 await msg.channel.send("Your avatar: " + str(msg.author.avatar_url))
@@ -203,7 +208,10 @@ async def on_message(msg):
         elif msg.content.startswith('=1984'): #shoutout laura
             if msg.reference:
                 repliedMsg = await msg.channel.fetch_message(msg.reference.message_id)
-                my_image = Image.open("1984.png")
+                content = repliedMsg.content
+                url = content.replace(' ', '_')
+                await msg.channel.send('https://api.memegen.link/images/custom/'+ url + '.png?background=https://media.discordapp.net/attachments/601537881261211654/856290564676649001/1984.png')
+                '''my_image = Image.open("1984.png")
                 title_font = ImageFont.truetype('impact.ttf', 50)
                 text_to_add = repliedMsg.content
                 image_editable = ImageDraw.Draw(my_image)
@@ -219,6 +227,7 @@ async def on_message(msg):
                 my_image.save("result.png")
                 file = discord.File("result.png")
                 await msg.channel.send(file=file)
+                '''
             else:
                 await msg.channel.send("You need to be replying to a message!")
         else:
