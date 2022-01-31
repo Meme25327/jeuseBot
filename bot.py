@@ -151,41 +151,44 @@ async def on_message(msg):
                         answer = eval(str(''.join(args)))
                 await msg.channel.send('```' + str(answer) + '```')
         elif msg.content.startswith("=a"):
-            #opens the text document from previous code, stores all confessions in a list
-            with open('confessions.txt', 'r') as data:
-                data = data.readlines()
-                try:
-                    numToApprove = splitMsg.pop(1)
-                except:
+            if msg.channel.id == 908646167146012716: #approval channel should end with 2716 when running
+                #opens the text document from previous code, stores all confessions in a list
+                with open('confessions.txt', 'r') as data:
+                    data = data.readlines()
+                    try:
+                        numToApprove = splitMsg.pop(1)
+                    except:
+                        numToApprove = 1
+                if numToApprove == "nsfw" or numToApprove == "spoil":
                     numToApprove = 1
-            if numToApprove == "nsfw" or numToApprove == "spoil":
-                numToApprove = 1
-            print("confession #" + str(numToApprove), "will be approved.")
-            confessionChannel = client.get_channel(772794910826430494) #should end with 0494 when running
-            
-            if len(args) > 0:
-                print("ge")
-                if "spoil" in args and "nsfw" in args:
-                    confession = "||" + data[-(int(numToApprove))][:-1] + "|| (spoiler tags typically indicate sensitive content)"
-                    nsfwConfessionChannel = client.get_channel(772794910826430494) #should end with 8120 when running
-                    await nsfwConfessionChannel.send("Message received: " + confession)
-                if "spoil" in args and "nsfw" not in args:
-                    confession = "|| " + data[-(int(numToApprove))][:-1] + " || (spoiler tags typically indicate sensitive content)"
-                    await confessionChannel.send("Message received: " + confession)
-                '''else:
-                    approvalChannel = client.get_channel(772780671634374677) #should end with 0466 when running
-                    await approvalChannel.send("Please try that again!")'''
-                if "nsfw" in args and "spoil" not in args:
-                    nsfwConfessionChannel = client.get_channel(908646804915118120) #should end with 8120 when running
-                    await nsfwConfessionChannel.send("Message received: " + data[-int(numToApprove)])
-                if "nsfw" not in args and "spoil" not in args:
+                print("confession #" + str(numToApprove), "will be approved.")
+                confessionChannel = client.get_channel(772794910826430494) #should end with 0494 when running
+                
+                if len(args) > 0:
+                    print("ge")
+                    if "spoil" in args and "nsfw" in args:
+                        confession = "||" + data[-(int(numToApprove))][:-1] + "|| (spoiler tags typically indicate sensitive content)"
+                        nsfwConfessionChannel = client.get_channel(905871745041436672) #should end with 6672 when running
+                        await nsfwConfessionChannel.send("Message received: " + confession)
+                    if "spoil" in args and "nsfw" not in args:
+                        confession = "|| " + data[-(int(numToApprove))][:-1] + " || (spoiler tags typically indicate sensitive content)"
+                        await confessionChannel.send("Message received: " + confession)
+                    '''else:
+                        approvalChannel = client.get_channel(772780671634374677) #should end with 0466 when running
+                        await approvalChannel.send("Please try that again!")'''
+                    if "nsfw" in args and "spoil" not in args:
+                        nsfwConfessionChannel = client.get_channel(905871745041436672) #should end with 6672 when running
+                        await nsfwConfessionChannel.send("Message received: " + data[-int(numToApprove)])
+                    if "nsfw" not in args and "spoil" not in args:
+                        confession = data[-int(numToApprove)]
+                        await confessionChannel.send("Message received: " + confession)
+                else:
+                    print("waogj")
                     confession = data[-int(numToApprove)]
                     await confessionChannel.send("Message received: " + confession)
             else:
-                print("waogj")
-                confession = data[-int(numToApprove)]
-                await confessionChannel.send("Message received: " + confession)
-                
+                print("V")
+                    
         elif msg.content.startswith('=github'):
             await msg.channel.send("jeuseBot's code can be found at: https://github.com/Meme25327/jeuseBot")
         elif msg.content.startswith('=ftoc'):
