@@ -7,7 +7,7 @@ from googlesearch import search
 from bs4 import BeautifulSoup
 import requests
 from youtubesearchpython import SearchVideos, Search
-from youtubesearchpython.internal.constants import ResultMode
+#from youtubesearchpython.internal.constants import ResultMode
 from PIL import Image, ImageFont, ImageDraw
 import textwrap
 import json
@@ -75,6 +75,9 @@ async def on_ready():
 async def on_message(msg):
     if msg.author == client.user: #ignores the message if it comes from the bot
         return
+    chance = random.randint(1, 1000)
+    if chance == 1000:
+        await msg.channel.send("https://images-ext-1.discordapp.net/external/m_y7k6wh-vwjl7jZisRBuzehmiNj76kj3c0Zidj0YD0/https/media.discordapp.net/attachments/853014263260774400/946064570190037032/m-1.gif")
 
     #splits the message to find the arguments. stored in the format of a list
     splitMsg = msg.content.split(' ')
@@ -216,10 +219,13 @@ async def on_message(msg):
 
             headers = {'User-Agent': 'Mozilla/5.0'}
             
-            for results in search(query, num = 1, stop = 3, pause = 0, tld = "co.in"):
+            for results in search(query, 1, 1, 0):
                 print(results)
                 num += 1
-                reqs = requests.get(results)
+                try:
+                    reqs = requests.get(results)
+                except:
+                    await msg.channel.send("```bot bronk. jeuse knows so don't bother him about it.```")
                 soup = BeautifulSoup(reqs.text, 'html.parser')
                 siteTitle = ''
                 for title in soup.find_all('title'): 
@@ -408,7 +414,7 @@ async def on_message(msg):
         elif msg.content.startswith("=jesse"):
             await msg.channel.send("https://cdn.discordapp.com/attachments/716887644365258772/914135132183601153/unknown.png")
         elif msg.content.startswith("=sex2014"):
-            await msg.channel.send("https://cdn.discordapp.com/attachments/716887644365258772/917043732195459072/sex2014.gif")
+            await msg.channel.send("https://cdn.discordapp.com/attachments/716887644365258772/938846601227673650/sex2014.gif")
         elif msg.content.startswith("=wiki") or msg.content.startswith("=wikipedia"):
             wiki_wiki = wikipediaapi.Wikipedia('en')
             
