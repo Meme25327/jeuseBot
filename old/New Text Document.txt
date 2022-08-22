@@ -1,0 +1,23 @@
+The answer is: "a/b is the unique solution to the equation bz=a." (I'm using z as the unknown, since you are using x
+
+for other things).
+
+Given that answer, let's discuss your points out of order:
+
+(3) is perfectly fine: 0/x
+, with x≠0, is the solution to xz=0; the unique solution is z=0, so 0/x=z. The reason it's unique is because x≠0, so the only way for the product to be 0 is if z is 0
+
+.
+
+In (1), by "impossible" we mean that the equation that defines it has no solutions: for something to be equal to x/0
+, with x≠0, we would need 0z=x. But 0z=0 for any z, so there are no solutions to the equation. Since there are no solutions to the equation, there is no such thing as "x/0". So x/0
+
+does not represent any number.
+
+In (2), the situation is a bit trickier; in terms of the defining equation, the problem here is that the equation 0z=0
+has any value of z as a solution (that's what the "infinite solutions" means). Since the expression a/b means "the unique solution to bx=a, then when a=b=0
+
+, you don't have a unique answer, so there is no "unique solution".
+
+Generally speaking, we simply do not define "division by 0
+". The issue is that, once you get to calculus, you are going to find situations where you have two variable quantities, a and b, and you are considering a/b; and as a and b changes, you want to know what happens to a/b. In those situations, if a is approaching x and b is approaching y≠0, then a/b will approach x/y, no problem. If a approaches x≠0, and b approaches 0, then a/b does not approach anything (the "limits does not exist"). But if both a and b approach 0, then you don't know what happens to a/b; it can exist, not exist, or approach pretty much any number. We say this kind of limit is "indeterminate". So there is a reason for separating out cases (1) and (2): very soon you will see an important qualitative difference between the first kind of "does not exist" and the second kind.
