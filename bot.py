@@ -111,6 +111,8 @@ async def on_message(msg):
                     await svNameCommand(msg)
                 case 'stopsvname':
                     await stopSvNameCommand(msg)
+                case 'convert':
+                    await convertCommand(msg)
                 case 'test':
                     await testCommand(msg)
                 case _: #catch-all case
@@ -587,6 +589,30 @@ async def svNameCommand(msg):
         pass
     else:
         await msg.channel.send("`Command not recognized! Try =help.`")
+
+async def convertCommand(msg):
+    amount = args[0]
+    start = args[1]
+    target = args[-1]
+    url = "https://api.apilayer.com/exchangerates_data/convert?to=" + target + "&from=" + start + "&amount=" + amount
+
+    payload = {}
+    headers= {"apikey": "hSBA6NHxu7IDTjKA7RvaA6oFiny5PyE7"}
+
+    response = requests.request("GET", url, headers=headers, data = payload)
+    
+    status_code = response.status_code
+    result = response.json()
+
+    givenInput = str(result["query"]["amount"]) + result["query"]["from"].lower()
+    givenOutput = str(round(result["result"], 2)) + result["query"]["to"].lower()
+
+    embed = discord.Embed()
+    embed.add_field(name = "Input", value = givenInput)
+    embed.add_field(name = "Output", value = givenOutput)
+
+    await msg.channel.send(embed=embed)
+    
 
 async def stopSvNameCommand(msg):
     if msg.author.id == 258582004738555904:

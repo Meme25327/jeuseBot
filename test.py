@@ -1,24 +1,19 @@
-import random
-from datetime import date
-import string
+import requests
 
-import numpy as np
+url = "https://api.apilayer.com/exchangerates_data/convert?to=GBP&from=INR&amount=8000"
 
-today = date.today()
+payload = {}
+headers= {
+  "apikey": "hSBA6NHxu7IDTjKA7RvaA6oFiny5PyE7"
+}
 
-# dd/mm/YY
-d1 = today.strftime("%d%m%Y")
-print(d1)
+response = requests.request("GET", url, headers=headers, data = payload)
 
-uID = input("Enter the user ID: ")
+status_code = response.status_code
+result = response.json()
 
-rng2 = np.random.RandomState(int(d1))
-
-print(rng2.randint(0, 100, 1))  # [8]
-
-
-'''
-
-random.seed(uID)
-print(''.join(random.choices(string.ascii_lowercase, k=5)))
-'''
+print(result["query"]["amount"], end = ' ')
+print(result["query"]["from"], end = ' ')
+print("is equal to", end = ' ')
+print(result["result"], end = ' ')
+print(result["query"]["to"], end = ' ')
