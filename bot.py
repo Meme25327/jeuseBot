@@ -1,11 +1,3 @@
-'''
-TODO:
--Approval
--Google
--Youtube
--Image
-'''
-
 import random
 import os
 import datetime
@@ -21,10 +13,12 @@ from dotenv import load_dotenv
 #intents = discord.Intents(messages=True)
 
 load_dotenv()
-TOKEN = os.getenv('TOKEN')
+DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
+FLIGHT_TOKEN = os.getenv('FLIGHT_TOKEN')
 
 intents = discord.Intents(messages=True, guilds=True, message_content=True)
 client = discord.Client(intents=intents)
+null = None
 
 @client.event
 async def on_ready():
@@ -113,6 +107,8 @@ async def on_message(msg):
                     await stopSvNameCommand(msg)
                 case 'convert':
                     await convertCommand(msg)
+                case 'track':
+                    await trackCommand(msg)
                 case 'test':
                     await testCommand(msg)
                 case _: #catch-all case
@@ -477,45 +473,6 @@ async def approvalCommand(msg):
             await seriousChannel.send(spoiledConfession)
         else:
             await confessionChannel.send(confession)
-'''                
-    if msg.channel.id == 1005558247928909995: #approval channel should end with 9995 when running   
-        fetch = msg.channel.history(limit=100)
-        confessions = []
-        i = 0
-        for fetched in fetch:
-            if fetched.author.id == 719764139702091836:
-                if fetched.content != '':
-                    confessions.append(fetched.content)
-        numToApprove = 1
-        for a in args:
-            if a.isdigit():
-                numToApprove = int(a)
-        approved = confessions[0:numToApprove]
-        revApproved = approved[::-1]
-        spoiled = False
-        nsfw = False
-        if "spoil" in args and "nsfw" in args:
-            nsfw = True
-            spoiled = True
-        elif "nsfw" in args and "spoil" not in args:
-            nsfw = True
-            spoiled = False
-        elif "spoil" in args and "nsfw" not in args:
-            nsfw = False
-            spoiled = True
-        for confession in revApproved:
-            confessionChannel = client.get_channel(1035143768380297357)
-            nsfwChannel = client.get_channel(1035143768380297357)
-            if spoiled and nsfw:
-                spoiledConfession = "|| " + confession + " || (spoiler tags typically indicate sensitive content)"
-                await nsfwChannel.send(spoiledConfession)
-            elif nsfw and not spoiled:
-                await nsfwChannel.send(confession)
-            elif not nsfw and spoiled:
-                spoiledConfession = "|| " + confession + " || (spoiler tags typically indicate sensitive content)"
-                await confessionChannel.send(spoiledConfession)
-            else:
-                await confessionChannel.send(confession)'''
 
 async def pokedexCommand(msg):
     url = requests.get("https://pokeapi.co/api/v2/pokemon/" + args[0])
@@ -642,7 +599,6 @@ async def convertCommand(msg):
     embed.add_field(name = "Output", value = givenOutput)
 
     await msg.channel.send(embed=embed)
-    
 
 async def stopSvNameCommand(msg):
     if msg.author.id == 258582004738555904:
@@ -664,4 +620,24 @@ async def testCommand(msg):
     else:
         await msg.channel.send("`Command not recognized! Try =help.`")
 
-client.run(TOKEN)
+async def trackCommand(msg):
+    flight_iata = args[0].replace('-', '')
+    url_request = requests.get("http://api.aviationstack.com/v1/flights?access_key=" + FLIGHT_TOKEN + "&flight_iata=" + flight_iata)
+    api_response = url_request.json()
+    #api_response = {"pagination": {"limit": 100, "offset": 0, "count": 2, "total": 2}, "data": [{"flight_date": "2022-12-16", "flight_status": "landed", "departure": {"airport": "Chhatrapati Shivaji International (Sahar International)", "timezone": "Asia/Kolkata", "iata": "BOM", "icao": "VABB", "terminal": "2", "gate": null, "delay": 17, "scheduled": "2022-12-16T06:45:00+00:00", "estimated": "2022-12-16T06:45:00+00:00", "actual": "2022-12-16T07:01:00+00:00", "estimated_runway": "2022-12-16T07:01:00+00:00", "actual_runway": "2022-12-16T07:01:00+00:00"}, "arrival": {"airport": "Bangalore International Airport", "timezone": "Asia/Kolkata", "iata": "BLR", "icao": "VOBL", "terminal": "1", "gate": "1", "baggage": "07", "delay": null, "scheduled": "2022-12-16T08:30:00+00:00", "estimated": "2022-12-16T08:30:00+00:00", "actual": "2022-12-16T08:16:00+00:00", "estimated_runway": "2022-12-16T08:16:00+00:00", "actual_runway": "2022-12-16T08:16:00+00:00"}, "airline": {"name": "Air India", "iata": "AI", "icao": "AIC"}, "flight": {"number": "603", "iata": "AI603", "icao": "AIC603", "codeshared": null}, "aircraft": null, "live": null}, {"flight_date": "2022-12-15", "flight_status": "landed", "departure": {"airport": "Chhatrapati Shivaji International (Sahar International)", "timezone": "Asia/Kolkata", "iata": "BOM", "icao": "VABB", "terminal": "2", "gate": null, "delay": 32, "scheduled": "2022-12-15T06:45:00+00:00", "estimated": "2022-12-15T06:45:00+00:00", "actual": "2022-12-15T07:16:00+00:00", "estimated_runway": "2022-12-15T07:16:00+00:00", "actual_runway": "2022-12-15T07:16:00+00:00"}, "arrival": {"airport": "Bangalore International Airport", "timezone": "Asia/Kolkata", "iata": "BLR", "icao": "VOBL", "terminal": "1", "gate": "7", "baggage": "06", "delay": 4, "scheduled": "2022-12-15T08:30:00+00:00", "estimated": "2022-12-15T08:30:00+00:00", "actual": "2022-12-15T08:34:00+00:00", "estimated_runway": "2022-12-15T08:34:00+00:00", "actual_runway": "2022-12-15T08:34:00+00:00"}, "airline": {"name": "Air India", "iata": "AI", "icao": "AIC"}, "flight": {"number": "603", "iata": "AI603", "icao": "AIC603", "codeshared": null}, "aircraft": null, "live": null}]}
+    searchURL = "https://www.google.com/search?q=" + flight_iata
+    depDateTime = api_response["data"][0]["departure"]["scheduled"][:10] + " " + api_response["data"][0]["departure"]["scheduled"][11:16] + " (" + api_response["data"][0]["departure"]["timezone"] + ")"
+    arrDateTime = api_response["data"][0]["arrival"]["scheduled"][:10] + " " + api_response["data"][0]["arrival"]["scheduled"][11:16] + " (" + api_response["data"][0]["arrival"]["timezone"] + ")"
+
+    embed = discord.Embed()
+    embed.description = "[Flight Tracking for %s](%s)"%(flight_iata.upper(), searchURL)
+    embed.add_field(name="Flight Status", value=api_response["data"][0]["flight_status"].capitalize(), inline=False)
+    embed.add_field(name="Departure Airport", value=api_response["data"][0]["departure"]["airport"])
+    embed.add_field(name="Departure Airport Code", value=api_response["data"][0]["departure"]["iata"])
+    embed.add_field(name="Departure Date & Time (Scheduled) (24h)", value=depDateTime, inline=False)
+    embed.add_field(name="Arrival Airport", value=api_response["data"][0]["arrival"]["airport"])
+    embed.add_field(name="Arrival Airport Code", value=api_response["data"][0]["arrival"]["iata"])
+    embed.add_field(name="Arrival Date & Time (Scheduled) (24h)", value=arrDateTime, inline=False)
+    await msg.channel.send(embed=embed)
+
+client.run(DISCORD_TOKEN)
