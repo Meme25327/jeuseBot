@@ -18,20 +18,30 @@ import wikipediaapi
 import discord
 from dotenv import load_dotenv
 
+#intents = discord.Intents(messages=True)
+
 load_dotenv()
-TOKEN = os.getenv('DISCORD_TOKEN')
-client = discord.Client()
+TOKEN = os.getenv('TOKEN')
+
+intents = discord.Intents(messages=True, guilds=True, message_content=True)
+client = discord.Client(intents=intents)
 
 @client.event
 async def on_ready():
     print(f'{client.user} has connected to Discord!')
     await client.change_presence(activity=discord.Activity(type=discord.ActivityType.playing, name="Fortnite"))
+    chan = client.get_channel(1005559503716102165)
+    #await chan.send("sex")
 
 
 @client.event
 async def on_message(msg):
+    #print("message got")
     if msg.author == client.user: #ignores the message if it comes from the bot
         return
+
+    if isinstance(msg.channel, discord.channel.DMChannel):
+        await confessionHandler(msg)
 
     #splits the message to find the arguments. stored in the format of a list
     splitMsg = msg.content.split(' ')
@@ -40,16 +50,6 @@ async def on_message(msg):
 
     if msg.attachments:
         msg.content = msg.content + " " + msg.attachments[0].proxy_url
-
-    #Confession handler. Looks for DMs and sends them for approval.
-    if isinstance(msg.channel, discord.channel.DMChannel):
-        await confessionHandler(msg)
-    else:        
-        chance = random.randint(1, 250)
-        if chance == 251: #reply gif joke
-            gifs = ["media/cat.gif", "media/crash.gif", "media/mammoth.gif", "media/nasx.gif", "media/strangled.gif"]
-            chosenGif = random.randint(0, len(gifs)-1)
-            await msg.channel.send(file=discord.File(gifs[chosenGif]))
         
     #Check Commands_____________________________________________________________________________________________________________________________________________________________
     #line is there so i can spot it easily -jeuse    
@@ -139,19 +139,17 @@ async def confessionHandler(msg):
         print("Confession Received: %s" % confession)
         print('='*30)
 
-        approvalChannel = client.get_channel(992071503392817174) #should end with 7174 when running
+        approvalChannel = client.get_channel(1005558247928909995) #should end with 9995 when running
 
         if "<@" in msg.content: #ensures people can't ping other people in a confession
             await msg.channel.send("Pinging is not allowed in a confession.")
         else:
-            await approvalChannel.send('Message Received: ' + ''.join(confession))
+            await approvalChannel.send(''.join(confession))
             emoji = '\N{THUMBS UP SIGN}'
             await msg.add_reaction(emoji)
 
 async def pingCommand(msg):
-    timeDif = datetime.datetime.utcnow() - msg.created_at
-    pong = "Pong! Responded in: 0." + str(timeDif)[-4:-7:-1] + " seconds!"
-    await msg.channel.send(pong)
+    await msg.channel.send("Pong!")
 
 async def helpCommand(msg):
     embed = discord.Embed(title="jeuseBot Help Menu")
@@ -448,8 +446,40 @@ async def wikipediaCommand(msg):
     await msg.channel.send(embed=embed)
 
 async def approvalCommand(msg):
-    if msg.channel.id == 992071503392817174: #approval channel should end with 7174 when running   
-        fetch = await msg.channel.history(limit=100).flatten()
+    if msg.channel.id == 1005558247928909995: #approval channel should end with 9995 when running
+        confession = "Confession Received: " + msg.content[3:].replace("{{nsfw}}", '').replace("{{spoil}}", '').replace("{{serious}}", '')
+        spoiled = False
+        nsfw = False
+        serious = False
+        if "{{spoil}}" in args:
+            spoiled = True
+        if "{{nsfw}}" in args:
+            nsfw = True
+        if "{{serious}}" in args:
+            serious = True
+            
+        confessionChannel = client.get_channel(1035143768380297357)
+        seriousChannel = client.get_channel(1005539188386570332)
+        nsfwChannel = client.get_channel(1005539234498740295)
+        
+        if spoiled and nsfw:
+            spoiledConfession = "Confession Recieved: || " + confession + " || (spoiler tags typically indicate sensitive content)"
+            await nsfwChannel.send(spoiledConfession)
+        elif nsfw and not spoiled:
+            await nsfwChannel.send(confession)
+        elif not nsfw and spoiled:
+            spoiledConfession = "Confession Recieved: || " + confession + " || (spoiler tags typically indicate sensitive content)"
+            await confessionChannel.send(spoiledConfession)
+        elif serious:
+            await seriousChannel.send(confession)
+        elif serious and spoiled:
+            spoiledConfession = "Confession Recieved: || " + confession + " || (spoiler tags typically indicate sensitive content)"
+            await seriousChannel.send(spoiledConfession)
+        else:
+            await confessionChannel.send(confession)
+'''                
+    if msg.channel.id == 1005558247928909995: #approval channel should end with 9995 when running   
+        fetch = msg.channel.history(limit=100)
         confessions = []
         i = 0
         for fetched in fetch:
@@ -474,8 +504,8 @@ async def approvalCommand(msg):
             nsfw = False
             spoiled = True
         for confession in revApproved:
-            confessionChannel = client.get_channel(772794910826430494)
-            nsfwChannel = client.get_channel(999349781879070730)
+            confessionChannel = client.get_channel(1035143768380297357)
+            nsfwChannel = client.get_channel(1035143768380297357)
             if spoiled and nsfw:
                 spoiledConfession = "|| " + confession + " || (spoiler tags typically indicate sensitive content)"
                 await nsfwChannel.send(spoiledConfession)
@@ -485,7 +515,7 @@ async def approvalCommand(msg):
                 spoiledConfession = "|| " + confession + " || (spoiler tags typically indicate sensitive content)"
                 await confessionChannel.send(spoiledConfession)
             else:
-                await confessionChannel.send(confession)
+                await confessionChannel.send(confession)'''
 
 async def pokedexCommand(msg):
     url = requests.get("https://pokeapi.co/api/v2/pokemon/" + args[0])
