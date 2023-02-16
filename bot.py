@@ -1,5 +1,6 @@
 import random
 import os
+import time
 import datetime
 import string
 from unicodedata import name
@@ -24,18 +25,19 @@ null = None
 async def on_ready():
     print(f'{client.user} has connected to Discord!')
     await client.change_presence(activity=discord.Activity(type=discord.ActivityType.playing, name="Fortnite"))
-    chan = client.get_channel(1005559503716102165)
-    #await chan.send("sex")
 
 
 @client.event
 async def on_message(msg):
     #print("message got")
-    if msg.author == client.user: #ignores the message if it comes from the bot
+    if msg.author.bot: #ignores the message if it comes from a bot
         return
 
     if isinstance(msg.channel, discord.channel.DMChannel):
         await confessionHandler(msg)
+    else:
+        with open("messages.txt", 'a') as f: #message logger
+            f.write(str(msg.id))
 
     #splits the message to find the arguments. stored in the format of a list
     splitMsg = msg.content.split(' ')
@@ -109,6 +111,9 @@ async def on_message(msg):
                     await convertCommand(msg)
                 case 'track':
                     await trackCommand(msg)
+                case 'name':
+                    await nameCommand(msg)
+                    doName = True
                 case 'test':
                     await testCommand(msg)
                 case _: #catch-all case
@@ -639,5 +644,34 @@ async def trackCommand(msg):
     embed.add_field(name="Arrival Airport Code", value=api_response["data"][0]["arrival"]["iata"])
     embed.add_field(name="Arrival Date & Time (Scheduled) (24h)", value=arrDateTime, inline=False)
     await msg.channel.send(embed=embed)
+
+async def nameCommand(msg):
+    await asyncio.sleep(5)
+    nameCommandCount = 0
+    if msg.author.id == 258582004738555904:
+        messages = ["`NAME REVEAL PROTOCOL INTIATED`",
+                                "`NEGATIVE REACTION DETECTED. ACQUIRING CONFIRMATION.`",
+                                "`MASTER. DO YOU NOT WISH ME TO NOT STOP NOT REVEALING YOUR NAME?`",
+                                "`CONFIRMATION ACQUIRED. PROTOCOL CONTINUING.`",
+                                "n.jpg",
+                                "z.jpg",
+                                "a.jpg",
+                                "r.jpg",
+                                "`NAME REVEAL PROTOCOL CONCLUDED. RESUMING NORMAL OPERATION NOW.`"]
+        try:
+            while nameCommandCount <= len(messages):
+                if nameCommandCount == 1:
+                    await msg.channel.send(file = discord.File("a.jpg"))
+                    await asyncio.sleep(4)
+                if nameCommandCount not in [0, 1, 2, 3, 8]:
+                    await msg.channel.send(file = discord.File(messages[nameCommandCount]))
+                    nameCommandCount += 1
+                    await asyncio.sleep(1)
+                else:
+                    await msg.channel.send(messages[nameCommandCount])
+                    nameCommandCount += 1
+                    await asyncio.sleep(4)
+        except:
+            return
 
 client.run(DISCORD_TOKEN)

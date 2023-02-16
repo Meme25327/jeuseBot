@@ -1,0 +1,13 @@
+- total messages
+- user with most messages
+- most active hours (graph form)
+- most active channel
+- most used word (that's not common words like "uh", "is", "the", etc)
+- how many times jB went down
+- total number of slurs
+- most used emoji
+- how many times we mentioned k*ra (we're definitely over her guys i swear)
+
+survey:
+- favorite pin
+- most memorable vc
